@@ -1,13 +1,13 @@
 import express from 'express'
 import cors from 'cors'
+import todoListRoutes from '../routes/todoListRoutes.js'
 
 const app = express()
+const PORT = 3001
 
 app.use(cors())
 app.use(express.json())
 
-const PORT = 3001
+app.use('/api/todoList', todoListRoutes)
 
-app.get('/', (req, res) => res.send('Hello World!'))
-
-app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`))
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
