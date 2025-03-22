@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { TextField, Card, CardContent, CardActions, Button, Typography } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
@@ -6,19 +6,38 @@ import AddIcon from '@mui/icons-material/Add'
 export const TodoListForm = ({ todoList, saveTodoList }) => {
   const [todos, setTodos] = useState(todoList.todos)
 
-  const handleSubmit = (event) => {
-    event.preventDefault()
+  const debounce = (func, delay) => {
+    let debounceTimer
+    return function (...args) {
+      clearTimeout(debounceTimer)
+      debounceTimer = setTimeout(() => func.apply(this, args), delay)
+    }
+  }
+
+  const autosave = debounce(() => {
     saveTodoList(todoList.id, { todos })
+  }, 1000)
+
+  useEffect(() => {
+    autosave()
+  }, [todos, autosave])
+
+  const handleChange = (event, index) => {
+    const newTodos = [...todos]
+    newTodos[index] = event.target.value
+    setTodos(newTodos)
+  }
+
+  const handleDelete = (index) => {
+    const newTodos = todos.filter((_, i) => i !== index)
+    setTodos(newTodos)
   }
 
   return (
     <Card sx={{ margin: '0 1rem' }}>
       <CardContent>
         <Typography component='h2'>{todoList.title}</Typography>
-        <form
-          onSubmit={handleSubmit}
-          style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}
-        >
+        <form style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
           {todos.map((name, index) => (
             <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
               <Typography sx={{ margin: '8px' }} variant='h6'>
@@ -28,26 +47,13 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
                 sx={{ flexGrow: 1, marginTop: '1rem' }}
                 label='What to do?'
                 value={name}
-                onChange={(event) => {
-                  setTodos([
-                    // immutable update
-                    ...todos.slice(0, index),
-                    event.target.value,
-                    ...todos.slice(index + 1),
-                  ])
-                }}
+                onChange={(event) => handleChange(event, index)}
               />
               <Button
                 sx={{ margin: '8px' }}
                 size='small'
                 color='secondary'
-                onClick={() => {
-                  setTodos([
-                    // immutable delete
-                    ...todos.slice(0, index),
-                    ...todos.slice(index + 1),
-                  ])
-                }}
+                onClick={() => handleDelete(index)}
               >
                 <DeleteIcon />
               </Button>
@@ -62,9 +68,6 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
               }}
             >
               Add Todo <AddIcon />
-            </Button>
-            <Button type='submit' variant='contained' color='primary'>
-              Save
             </Button>
           </CardActions>
         </form>
