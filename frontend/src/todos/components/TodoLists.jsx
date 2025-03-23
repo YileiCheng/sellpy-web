@@ -7,6 +7,7 @@ import {
   ListItemText,
   ListItemIcon,
   Typography,
+  Chip,
 } from '@mui/material'
 import ReceiptIcon from '@mui/icons-material/Receipt'
 import { TodoListForm } from './TodoListForm'
@@ -28,8 +29,7 @@ export const TodoLists = ({ style }) => {
   const saveTodoList = async (id, { todos }) => {
     try {
       const listToUpdate = todoLists[id]
-      const updatedList = { ...listToUpdate, todos }
-      await updateTodoList(id, updatedList)
+      const updatedList = await updateTodoList(id, { ...listToUpdate, todos })
       setTodoLists((prevTodoLists) => ({
         ...prevTodoLists,
         [id]: updatedList,
@@ -56,6 +56,9 @@ export const TodoLists = ({ style }) => {
                   <ReceiptIcon />
                 </ListItemIcon>
                 <ListItemText primary={todoLists[key].title} />
+                {todoLists[key].allCompleted && (
+                  <Chip label='Completed' color='success' variant='outlined' />
+                )}
               </ListItemButton>
             ))}
           </List>

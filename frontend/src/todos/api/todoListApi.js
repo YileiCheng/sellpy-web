@@ -6,5 +6,6 @@ export const getTodoLists = async () => {
 }
 
 export const updateTodoList = async (id, updatedList) => {
-  await axios.post(`/api/todoList/${id}`, updatedList)
+  const res = await axios.post(`/api/todoList/${id}`, updatedList)
+  return res.data
 }
