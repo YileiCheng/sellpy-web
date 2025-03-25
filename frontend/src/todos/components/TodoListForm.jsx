@@ -22,10 +22,8 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
   const [showDatePicker, setShowDatePicker] = useState(null)
 
   useEffect(() => {
-    const autosave = () => {
-      saveTodoList(todoList.id, { todos })
-    }
-    autosave()
+    saveTodoList(todoList.id, { todos })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [todos])
 
   const handleChange = (event, index) => {
