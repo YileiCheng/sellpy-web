@@ -53,8 +53,8 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
   }
 
   const getDaysLeft = (dueDate) => {
-    const today = dayjs()
-    const due = dayjs(dueDate)
+    const today = dayjs().startOf('day')
+    const due = dayjs(dueDate).startOf('day')
     return due.diff(today, 'day')
   }
 
@@ -90,6 +90,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
                   />
                   <Button
                     sx={{ margin: '8px' }}
+                    aria-label='delete todo'
                     size='small'
                     color='secondary'
                     onClick={() => handleDelete(index)}
@@ -116,20 +117,27 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
                           visibility: todo.completed ? 'hidden' : 'visible',
                         }}
                       >
-                        {getDaysLeft(todo.dueDate) < 0
-                          ? `${Math.abs(getDaysLeft(todo.dueDate))} days overdue`
-                          : `${getDaysLeft(todo.dueDate)} days left`}
+                        {getDaysLeft(todo.dueDate) < 0 &&
+                          `${Math.abs(getDaysLeft(todo.dueDate))} days overdue`}
+                        {getDaysLeft(todo.dueDate) === 0 && 'Due today'}
+                        {getDaysLeft(todo.dueDate) === 1 && 'Due tomorrow'}
+                        {getDaysLeft(todo.dueDate) > 1 && `${getDaysLeft(todo.dueDate)} days left`}
                       </Typography>
                     )}
                   </div>
                 )}
-                <Dialog open={showDatePicker === index}>
+                <Dialog open={showDatePicker === index} onClose={() => setShowDatePicker(null)}>
                   <DialogContent>
                     <StaticDatePicker
+                      sx={{
+                        '& .MuiPickersLayout-actionBar': {
+                          visibility: 'hidden',
+                        },
+                      }}
                       orientation='landscape'
                       openTo='day'
                       value={dayjs(todo.dueDate)}
-                      onAccept={(date) => handleDateChange(date, index)}
+                      onChange={(date) => handleDateChange(date, index)}
                     />
                   </DialogContent>
                 </Dialog>
